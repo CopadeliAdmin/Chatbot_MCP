@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from back import GeminiChat
+from back import OpenAIChat
 
 # Configuration de la page
 st.set_page_config(page_title="Copadeli - Assistant Ventes", layout="centered")
@@ -9,13 +9,7 @@ st.title("🥩 Copadeli - Analyseur de Ventes")
 st.write("Posez vos questions sur la base de données fournisseur_viande.db")
 
 # Barre latérale pour la clé API
-with st.sidebar:
-    st.header("Configuration")
-    api_key = st.text_input("Clé Gemini API", type="password", value=os.getenv("GEMINI_API_KEY", ""))
-    if not api_key:
-        st.warning("Veuillez entrer une clé API Gemini pour continuer.")
-        st.stop()
-    
+with st.sidebar:    
     st.info("""
     Cet assistant peut répondre à des questions comme :
     - Quels sont mes meilleurs clients ?
@@ -24,9 +18,8 @@ with st.sidebar:
     """)
 
 # Initialisation du chat
-if "chat_engine" not in st.session_state or st.session_state.get("current_api_key") != api_key:
-    st.session_state.chat_engine = GeminiChat(api_key)
-    st.session_state.current_api_key = api_key
+if "chat_engine" not in st.session_state:
+    st.session_state.chat_engine = OpenAIChat()
     st.session_state.messages = []
 
 # Affichage de l'historique des messages
