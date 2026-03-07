@@ -21,6 +21,7 @@ with st.sidebar:
 if "chat_engine" not in st.session_state:
     st.session_state.chat_engine = OpenAIChat()
     st.session_state.messages = []
+    os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 # Affichage de l'historique des messages
 for message in st.session_state.messages:
