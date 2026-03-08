@@ -40,7 +40,7 @@ def query_database(sql_query: str) -> str:
 class OpenAIChat:
     def __init__(self):
         self.client = OpenAI()
-        self.model = "gpt-4"
+        self.model = "gpt-5"
         self.input_list = []
         self.instructions = (
             "Vous êtes un expert en analyse de données de vente pour Copadeli. "
