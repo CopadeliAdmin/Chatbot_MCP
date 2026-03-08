@@ -33,13 +33,13 @@ def query_database(sql_query: str) -> str:
 
         return f"Colonnes: {columns}\nDonnées: {results}"
     except Exception as e:
+        os.write(1,f"Erreur lors de l'exécution de la requête : {str(e)}".encode())
         return f"Erreur lors de l'exécution de la requête : {str(e)}"
 
 
 class OpenAIChat:
     def __init__(self):
         self.client = OpenAI()
-        # On utilise le modèle gpt-4 comme indiqué dans l'exemple
         self.model = "gpt-4"
         self.input_list = []
         self.instructions = (
