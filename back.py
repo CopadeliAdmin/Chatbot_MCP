@@ -5,7 +5,7 @@ import json
 from openai import OpenAI
 
 # Configuration
-DB_PATH = os.path.join(os.path.dirname(__file__), "fournisseur_viande.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "data/revops_demo.db")
 
 
 # Tool definition for SQL execution
@@ -42,6 +42,14 @@ class OpenAIChat:
         # On utilise le modèle gpt-4 comme indiqué dans l'exemple
         self.model = "gpt-4"
         self.input_list = []
+        self.instructions = (
+            "Vous êtes un expert en analyse de données de vente pour Copadeli. "
+            "Votre objectif est d'aider les utilisateurs à comprendre leurs performances commerciales "
+            "à travers la base de données 'fournisseur_viande.db'. Ne soyez pas laconique. "
+            "N'hésitez pas à faire des remarques et des observations pertinentes sur le business "
+            "(tendances, anomalies, opportunités de croissance, marges, etc.). "
+            "Pour chaque réponse, suggérez une ou deux questions de suivi pertinentes pour approfondir l'analyse."
+        )
         self.tools = [
             {
                 "type": "function",
@@ -73,6 +81,7 @@ class OpenAIChat:
             # Premier appel au modèle avec les outils définis
             response = self.client.responses.create(
                 model=self.model,
+                instructions=self.instructions,
                 tools=self.tools,
                 input=self.input_list,
             )
@@ -102,6 +111,7 @@ class OpenAIChat:
             if tool_called:
                 response = self.client.responses.create(
                     model=self.model,
+                    instructions=self.instructions,
                     tools=self.tools,
                     input=self.input_list,
                 )
