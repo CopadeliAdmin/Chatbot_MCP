@@ -107,20 +107,35 @@ class OpenAIChat:
                             })
                         })
 
-            # Si un outil a été appelé, on sollicite à nouveau le modèle pour obtenir la réponse finale
+            # Si un outil a été appelé, on sollicite à nouveau le modèle pour obtenir la réponse finale en streaming
             if tool_called:
-                response = self.client.responses.create(
+                # Appel final en streaming
+                stream = self.client.responses.create(
                     model=self.model,
                     instructions=self.instructions,
                     tools=self.tools,
                     input=self.input_list,
+                    stream=True,
                 )
-                # Enregistrer la réponse finale dans l'historique
-                self.input_list += response.output
+                
+                full_response = ""
+                for chunk in stream:
+                    # On suppose que le chunk a un attribut text ou similaire selon cet SDK
+                    if hasattr(chunk, 'text') and chunk.text:
+                        full_response += chunk.text
+                        yield chunk.text
+                
+                # Enregistrer la réponse finale dans l'historique (sous forme d'objet output attendu par le SDK)
+                # Note: On recrée l'objet attendu si possible, ou on stocke juste le texte
+                self.input_list.append({"role": "assistant", "content": full_response})
+            else:
+                # Si pas d'outil, on peut streamer la réponse initiale ou juste la yielder si elle est déjà là
+                # Pour garder la consistance, on yield le texte de la réponse initiale
+                yield response.output_text
+                self.input_list.append({"role": "assistant", "content": response.output_text})
 
-            return response.output_text
         except Exception as e:
-            return f"Désolé, une erreur est survenue : {str(e)}"
+            yield f"Désolé, une erreur est survenue : {str(e)}"
 
 
 if __name__ == "__main__":
